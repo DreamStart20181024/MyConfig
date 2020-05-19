@@ -14,11 +14,11 @@ set nocompatible                                                    " 不启用v
 syntax on                                                           " 语法高亮支持
 "filetype off                                                       " 关闭文件类型自动检测功能,这个功能被filetype plugin indent on代替
 "filetype plugin indent on                                          " 载入文件类型插件,代替filetype off 
-colorscheme molokai                                                 " 设置着色模式和字体
+"colorscheme molokai                                                 " 设置着色模式和字体
 set guifont=Hack:h11                                                " 设置字体
 "set background=light                                               " 设置vim背景为浅色
 set background=dark                                                 " 设置vim背景为深色
-"colorscheme gruvbox                                                " 设置gruvbox高亮主题
+colorscheme gruvbox                                                " 设置gruvbox高亮主题
 " 设置文件编码和文件格式
 set fenc=utf-8
 set encoding=utf-8
@@ -103,8 +103,8 @@ nnoremap <C-k> <C-W>k
 nnoremap <C-l> <C-W>l
 nnoremap <C-h> <C-W>h
 
-map <C-A> ggVG                              " 全选 + 复制
-map! <C-A> <Esc>ggVG                        " 全选 + 复制
+"map <C-A> ggVG                              " 全选 + 复制
+"map! <C-A> <Esc>ggVG                        " 全选 + 复制
 
 "ctrl+f 复制到系统粘贴板
 "map  <C-F> "+y
@@ -233,25 +233,6 @@ let g:autopep8_disable_show_diff=1
 "  au VimLeave * silent execute '!echo -ne "\e[ q"' | redraw!
 "endif
 
-"缓存
-autocmd BufEnter * call ncm2#enable_for_buffer()
-" 补全模式,具体详情请看下文
-set completeopt=menu,noinsert
-set shortmess+=c
-inoremap <c-c> <ESC>
-" 延迟弹窗,这样提示更加流畅
-let ncm2#popup_delay = 5
-"输入几个字母开始提醒:[[最小优先级,最小长度]]
-"如果是输入的是[[1,3],[7,2]],那么优先级在1-6之间,会在输入3个字符弹出,如果大于等于7,则2个字符弹出----优先级概念请参考文档中 ncm2-priority 
-let ncm2#complete_length = [[1, 1]]
-"模糊匹配模式,详情请输入:help ncm2查看相关文档
-let g:ncm2#matcher = 'substrfuzzy'
-"使用tab键向下选择弹框菜单
-inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>" 
-"使用shift+tab键向上选择弹窗菜单,这里不设置因为笔记本比较难操作.如果向下太多我通常习惯使用Backspace键再重新操作一遍
-"inoremap <expr> <S> pumvisible() ? "\<C-p>" : "\<S>"
-
-
 
 
 
@@ -299,6 +280,157 @@ filetype plugin on
 "    endif
 "  endif
 "endfunction
+
+" ###############################   COC 代码补全插件配置   #######################################################
+" TextEdit might fail if hidden is not set.
+set hidden
+
+" Some servers have issues with backup files, see #649.
+set nobackup
+set nowritebackup
+
+" Give more space for displaying messages.
+set cmdheight=2
+
+" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
+" delays and poor user experience.
+set updatetime=300
+
+" Don't pass messages to |ins-completion-menu|.
+set shortmess+=c
+
+" Always show the signcolumn, otherwise it would shift the text each time
+" diagnostics appear/become resolved.
+set signcolumn=yes
+
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
+" position. Coc only does snippet and additional edit on confirm.
+" <cr> could be remapped by other vim plugin, try `:verbose imap <CR>`.
+if exists('*complete_info')
+  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+else
+  inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+endif
+
+" Use `[g` and `]g` to navigate diagnostics
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K to show documentation in preview window.
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Symbol renaming.
+nmap <leader>rn <Plug>(coc-rename)
+
+" Formatting selected code.
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder.
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+" Applying codeAction to the selected region.
+" Example: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap keys for applying codeAction to the current line.
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Apply AutoFix to problem on the current line.
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+" Map function and class text objects
+" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
+xmap if <Plug>(coc-funcobj-i)
+omap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap af <Plug>(coc-funcobj-a)
+xmap ic <Plug>(coc-classobj-i)
+omap ic <Plug>(coc-classobj-i)
+xmap ac <Plug>(coc-classobj-a)
+omap ac <Plug>(coc-classobj-a)
+
+" Use CTRL-S for selections ranges.
+" Requires 'textDocument/selectionRange' support of LS, ex: coc-tsserver
+nmap <silent> <C-s> <Plug>(coc-range-select)
+xmap <silent> <C-s> <Plug>(coc-range-select)
+
+" Add `:Format` command to format current buffer.
+command! -nargs=0 Format :call CocAction('format')
+
+" Add `:Fold` command to fold current buffer.
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+" Add `:OR` command for organize imports of the current buffer.
+command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+
+" Add (Neo)Vim's native statusline support.
+" NOTE: Please see `:h coc-status` for integrations with external plugins that
+" provide custom statusline: lightline.vim, vim-airline.
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
+" Mappings using CoCList:
+" Show all diagnostics.
+nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+" Manage extensions.
+nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+" Show commands.
+nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+" Find symbol of current document.
+nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+" Search workspace symbols.
+nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
+" Do default action for next item.
+nnoremap <silent> <space>j  :<C-u>CocNext<CR>
+" Do default action for previous item.
+nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
+" Resume latest coc list.
+nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+
+
+
+
+
+
 
 
 
@@ -397,18 +529,25 @@ Plug 'bling/vim-airline'
 "Plug 'ajmwagar/vim-deus'
 "*************代码补全******************
 "ncm2 代码补全
-Plug 'ncm2/ncm2'
-Plug 'roxma/nvim-yarp'
-"Plug 'HansPinckaers/ncm2-jedi'
-"jedi-vim 作用同样是代码补全,这里协助ncm2,仅开启方法参数提醒
-"Plug 'davidhalter/jedi-vim'
-" css补全插件
-Plug 'ncm2/ncm2-cssomni'
-" javascript 补全插件
-Plug 'ncm2/ncm2-tern',  {'do': 'npm install'}
+"Plug 'ncm2/ncm2'
+"Plug 'roxma/nvim-yarp'
+"Plug 'ncm2/ncm2-bufword'
+"Plug 'ncm2/ncm2-path'
+""Plug 'HansPinckaers/ncm2-jedi'
+""jedi-vim 作用同样是代码补全,这里协助ncm2,仅开启方法参数提醒
+""Plug 'davidhalter/jedi-vim'
+"" css补全插件
+"Plug 'ncm2/ncm2-cssomni'
+"" javascript 补全插件
+"Plug 'ncm2/ncm2-tern',  {'do': 'npm install'}
 "java 补全插件
-Plug 'ObserverOfTime/ncm2-jc2', {'for': ['java', 'jsp']}
-Plug 'artur-shaik/vim-javacomplete2', {'for': ['java', 'jsp']}
+"Plug 'ObserverOfTime/ncm2-jc2', {'for': ['java', 'jsp']}
+"Plug 'artur-shaik/vim-javacomplete2', {'for': ['java', 'jsp']}
+
+" ------------------------------------------------------
+
+"COC 补全插件
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 "*************效率工具*******************
 "vim-autopep8,自动格式化
@@ -434,8 +573,6 @@ Plug 'scrooloose/nerdtree'
 Plug 'mattn/emmet-vim'
 " 主题管理插件
 Plug 'itchyny/lightline.vim'
-" 括号匹配
-Plug 'jiangmiao/auto-pairs'
 " 符号匹配
 Plug 'junegunn/vim-easy-align'
 
@@ -474,6 +611,6 @@ Plug 'posva/vim-vue'
 "Plug 'ternjs/tern_for_vim'
 " 色彩高亮，例子: #66CCFF
 Plug 'gorodinskiy/vim-coloresque'
-" md 实施预览插件
+" md 时式预览插件
 Plug 'suan/vim-instant-markdown', {'for': 'markdown'}
 call plug#end()
