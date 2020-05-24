@@ -88,6 +88,7 @@ set completeopt=longest,noinsert,menuone,noselect,preview
 set ttyfast "should make scrolling faster
 set lazyredraw "same as above
 set visualbell
+set clipboard+=unnamedplus
 autocmd FilterWritePre * if &diff | setlocal wrap< | endif      " 使用 vimdiff 时，长行自动换行
 
 
@@ -129,7 +130,7 @@ func! CompileRunGcc()
                 exec "!clear":
                 exec "!time python3 %"
         elseif &filetype == 'html'
-                exec "!firefox % &"
+                exec "!google-chrome-stable % &"
         elseif &filetype == 'go'
                 " exec "!go build %<"
                 exec "!time go run %"
@@ -198,6 +199,12 @@ let NERDTreeQuitOnOpen=1                                        " 打开一个�
 "******************auto format设置***************
 "vim-autopep8设置,关闭diff提示
 let g:autopep8_disable_show_diff=1
+
+
+
+
+" vimtex 配置
+g:vimtex_compiler_method
 
 
 
@@ -498,19 +505,19 @@ nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 "    autocmd BufNewFile * normal G
 " endfunc
 "
-"" Python自动插入文件标题
-" autocmd BufNewFile *py exec ":call SetPythonTitle()"
-" func SetPythonTitle()
-"  call setline(1,"# Copyright (c) StilesYu  All Rights Reserved.")
-"  call append(line("."), "\# File Name: ".("%"))
-"  call append(line(".")+1, "\# Author: Stiles Yu")
-"  call append(line(".")+2, "\# mail: yuxiaochen886@gmail.com")
-"  call append(line(".")+3,"\# github:https://github.com/Stilesyu")
-"  call append(line(".")+4,"\# blog:http://www.stilesyu.com/")
-"  call append(line(".")+5, "\# Created Time: ".strftime("%Y-%m-%d",localtime()))
-" endfunc
-""新建文件后，自动定位到文件末尾
-" autocmd BufNewFile * normal G o
+" Python自动插入文件标题
+ autocmd BufNewFile *.py exec ":call SetPythonTitle()"
+func SetPythonTitle()
+  call setline(1,"# Copyright (c) StilesYu  All Rights Reserved.")
+  call append(line("."), "\# File Name: ".("%"))
+  call append(line(".")+1, "\# Author: Stiles Yu")
+  call append(line(".")+2, "\# mail: 13891328530@163.com")
+  call append(line(".")+3,"\# github:https://github.com/Stilesyu")
+  call append(line(".")+4,"\# blog:http://www.stilesyu.com/")
+ call append(line(".")+5, "\# Created Time: ".strftime("%Y-%m-%d",localtime()))
+	"新建文件后，自动定位到文件末尾
+	autocmd BufNewFile * normal G o
+endfunc
 
 
 
