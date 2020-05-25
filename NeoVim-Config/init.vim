@@ -98,12 +98,40 @@ autocmd FilterWritePre * if &diff | setlocal wrap< | endif      " 使用 vimdiff
 " F6自动格式化python文件
 "autocmd FileType python noremap <buffer> <F6> :call Autopep8()<CR>
 
-" ctrl-j/k/l/h  分屏窗口移动 Normal mode
-nnoremap <C-j> <C-W>j
-nnoremap <C-k> <C-W>k
-nnoremap <C-l> <C-W>l
-nnoremap <C-h> <C-W>h
+" \ /k/l/h <LEADER> = \ 分屏窗口移动 Normal mode
+noremap <LEADER> <C-W>j
+noremap <LEADER> <C-W>k
+noremap <LEADER> <C-W>l
+noremap <LEADER> <C-W>h
 
+
+" Disable the default s key
+noremap s <nop>
+
+
+" Save & quit
+noremap Q :q<CR>
+noremap <C-q> :qa<CR>
+noremap S :w<CR>
+
+" Open the vimrc file anytime
+noremap <LEADER>rc :e ~/.config/nvim/init.vim<CR>
+
+" make Y to copy till the end of the line 
+nnoremap Y y$
+
+" Copy to system clipboard
+"  复制到系统粘贴板
+vnoremap Y "+y
+
+" 折叠行
+noremap <LEADER>- :lN<CR>
+noremap <LEADER>= :lne<CR>
+
+
+
+" 格式化
+nnoremap \f :Autoformat<CR>
 "map <C-A> ggVG                              " 全选 + 复制
 "map! <C-A> <Esc>ggVG                        " 全选 + 复制
 
@@ -111,6 +139,7 @@ nnoremap <C-h> <C-W>h
 "map  <C-F> "+y
 "map! <C-F> "+y
 
+" ##########################   自动编译文件    ######################################
 " F5 自动编译文件 Normal+Visual mode
 map <F5> :call CompileRunGcc()<CR>
 func! CompileRunGcc()
