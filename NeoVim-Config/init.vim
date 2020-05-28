@@ -13,12 +13,13 @@ set history=1000                                                    "设置历�
 set nocompatible                                                    " 不启用vi的键盘模式,而是vim自己的
 syntax on                                                           " 语法高亮支持
 "filetype off                                                       " 关闭文件类型自动检测功能,这个功能被filetype plugin indent on代替
-"filetype plugin indent on                                          " 载入文件类型插件,代替filetype off 
-"colorscheme molokai                                                 " 设置着色模式和字体
+filetype plugin indent on                                          " 载入文件类型插件,代替filetype off 
 set guifont=Hack:h11                                                " 设置字体
+packadd! dracula
+syntax enable
+colorscheme dracula													" 设置dracula高亮主题
 "set background=light                                               " 设置vim背景为浅色
-set background=dark                                                 " 设置vim背景为深色
-colorscheme gruvbox                                                " 设置gruvbox高亮主题
+"set background=dark                                                 " 设置vim背景为深色
 " 设置文件编码和文件格式
 set fenc=utf-8
 set encoding=utf-8
@@ -83,7 +84,6 @@ set wildmenu
 set ignorecase
 set smartcase
 set shortmess+=c
-set inccommand=split
 set completeopt=longest,noinsert,menuone,noselect,preview
 set ttyfast "should make scrolling faster
 set lazyredraw "same as above
@@ -99,10 +99,10 @@ autocmd FilterWritePre * if &diff | setlocal wrap< | endif      " 使用 vimdiff
 "autocmd FileType python noremap <buffer> <F6> :call Autopep8()<CR>
 
 " \ /k/l/h <LEADER> = \ 分屏窗口移动 Normal mode
-noremap <LEADER> <C-W>j
-noremap <LEADER> <C-W>k
-noremap <LEADER> <C-W>l
-noremap <LEADER> <C-W>h
+noremap <LEADER>j <C-W>j
+noremap <LEADER>k <C-W>k
+noremap <LEADER>l <C-W>l
+noremap <LEADER>h <C-W>h
 
 
 " Disable the default s key
@@ -123,7 +123,7 @@ nnoremap Y y$
 " Copy to system clipboard
 "  复制到系统粘贴板
 vnoremap Y "+y
-
+vnoremap P "+p
 " 折叠行
 noremap <LEADER>- :lN<CR>
 noremap <LEADER>= :lne<CR>
@@ -233,7 +233,7 @@ let g:autopep8_disable_show_diff=1
 
 
 " vimtex 配置
-g:vimtex_compiler_method
+"g:vimtex_compiler_method
 
 
 
@@ -557,8 +557,10 @@ endfunc
 call plug#begin()
 "启动vim或nvim你将看到一个酷酷的启动界面
 Plug 'mhinz/vim-startify'
+" 吸血鬼 主题
+Plug 'dracula/vim', { 'as': 'dracula' }
 "gruvbox 主题
-Plug 'morhetz/gruvbox'
+"Plug 'morhetz/gruvbox'
 "vim-airline 底部状态栏优化
 Plug 'bling/vim-airline'
 " 主题安装
