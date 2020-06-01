@@ -4,7 +4,35 @@
 "| |  | | | |   | |\  | \ V /  | || |  | |  _ <| |___
 "|_|  |_| |_|   |_| \_|  \_/  |___|_|  |_|_| \_\\____|
 
-" Author: @liupeng
+" Author: @Liu Peng
+"
+"
+"
+
+" ===
+" === 首次使用自动加载插件管理器
+" ===
+if empty(glob('~/.config/nvim/autoload/plug.vim'))
+	silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
+				\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+
+
+" ===
+" === Create a _machine_specific.vim file to adjust machine specific stuff, like python interpreter location
+" === 创建语言解释器的位置
+" ===
+let has_machine_specific_file = 1
+if empty(glob('~/.config/nvim/_machine_specific.vim'))
+	let has_machine_specific_file = 0
+	silent! exec "!cp ~/.config/nvim/default_configs/_machine_specific_default.vim ~/.config/nvim/_machine_specific.vim"
+endif
+source ~/.config/nvim/_machine_specific.vim
+
+
+
 
 
 "" ###################   基本设置    ######################################
@@ -36,7 +64,7 @@ set ruler                                                           " 右下角�
 set incsearch                                                       " 开启实时搜索功能
 set hlsearch                                                        " 开启高亮显示结果
 set nowrapscan                                                      " 搜索到文件两端时不重新搜索
-set nocompatible                                                    " 关闭兼容模式
+"set nocompatible                                                    " 关闭兼容模式
 set hidden                                                          " 允许在有未保存的修改时切换缓冲区
 set autochdir                                                       " 设定文件浏览器目录为当前目录
 set foldmethod=indent                                               " 选择代码折叠类型
@@ -44,8 +72,20 @@ set foldlevel=100                                                   " 禁止自�
 set laststatus=2                                                    " 开启状态栏信息
 set cmdheight=2                                                     " 命令行的高度，默认为1，这里设为2
 set autoread                                                        " 当文件在外部被修改时自动更新该文件
-set nobackup                                                        " 不生成备份文件
-set noswapfile                                                      " 不生成交换文件
+"set nobackup                                                        " 不生成备份文件
+"set noswapfile                                                      " 不生成交换文件
+
+silent !mkdir -p ~/.config/nvim/tmp/backup							" 创建备份文件存放目录
+silent !mkdir -p ~/.config/nvim/tmp/undo							" 创建交换文件存放目录
+"silent !mkdir -p ~/.config/nvim/tmp/sessions
+set backupdir=~/.config/nvim/tmp/backup,.							" 指定配置文件路径
+set directory=~/.config/nvim/tmp/backup,.							" 指定交换文件路径 
+if has('persistent_undo')
+	set undofile
+	set undodir=~/.config/nvim/tmp/undo,.							" 指定撤销文件的路径
+endif
+
+set virtualedit=block												" 允许可视列块模式的虚拟编辑
 set nrformats=                                                      " 关闭八进制
 set list                                                            " 显示特殊字符，其中Tab使用高亮~代替，尾部空白使用高亮点号代替
 set listchars=tab:\|\ ,trail:▫
@@ -91,10 +131,42 @@ set visualbell
 set clipboard+=unnamedplus
 autocmd FilterWritePre * if &diff | setlocal wrap< | endif      " 使用 vimdiff 时，长行自动换行
 
+" 打开文件时自动到文件最后的行
+au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+
+
+
+
+" ===
+" ===  终端的设置
+" ===
+"let g:neoterm_autoscroll = 1
+"autocmd TermOpen term://* startinsert
+"tnoremap <C-N> <C-\><C-N>
+"tnoremap <C-O> <C-\><C-N><C-O>
+"let g:terminal_color_0  = '#000000'
+"let g:terminal_color_1  = '#FF5555'
+"let g:terminal_color_2  = '#50FA7B'
+"let g:terminal_color_3  = '#F1FA8C'
+"let g:terminal_color_4  = '#BD93F9'
+"let g:terminal_color_5  = '#FF79C6'
+"let g:terminal_color_6  = '#8BE9FD'
+"let g:terminal_color_7  = '#BFBFBF'
+"let g:terminal_color_8  = '#4D4D4D'
+"let g:terminal_color_9  = '#FF6E67'
+"let g:terminal_color_10 = '#5AF78E'
+"let g:terminal_color_11 = '#F4F99D'
+"let g:terminal_color_12 = '#CAA9FA'
+"let g:terminal_color_13 = '#FF92D0'
+"let g:terminal_color_14 = '#9AEDFE'
+
 
 
 "##################################按键设置##################################
 
+" 普通模式下 将 ; 默认为 :
+noremap ; :
+noremap : ;
 " F6自动格式化python文件
 "autocmd FileType python noremap <buffer> <F6> :call Autopep8()<CR>
 
@@ -129,6 +201,22 @@ noremap <LEADER>- :lN<CR>
 noremap <LEADER>= :lne<CR>
 
 
+" 关闭高亮显示
+noremap <LEADER><CR> :nohlsearch<CR>
+
+" Adjacent duplicate words
+noremap <LEADER>dw /\(\<\w\+\>\)\_s*\1
+
+" 替换全局 TAB
+nnoremap <LEADER>tt :%s/    /\t/g
+vnoremap <LEADER>tt :s/    /\t/g
+
+" 折叠
+noremap <silent> <LEADER>o za
+
+" 打开 lazygit
+"noremap <LEADER>g :Git 
+"noremap <c-g> :tabe<CR>:-tabmove<CR>:term lazygit<CR>
 
 " 格式化
 nnoremap \f :Autoformat<CR>
@@ -142,33 +230,47 @@ nnoremap \f :Autoformat<CR>
 " ##########################   自动编译文件    ######################################
 " F5 自动编译文件 Normal+Visual mode
 map <F5> :call CompileRunGcc()<CR>
-func! CompileRunGcc()
-        exec "w"
-        if &filetype == 'c'
-                exec "!g++ % -o %<"
-                exec "!time ./%<"
-        elseif &filetype == 'cpp'
-                exec "!g++ % -o %<"
-                exec "!time ./%<"
-        elseif &filetype == 'java'
-                exec "!javac %"
-                exec "!time java %<"
-        elseif &filetype == 'sh'
-                :!time bash %
-        elseif &filetype == 'python'
-                exec "!clear":
-                exec "!time python3 %"
-        elseif &filetype == 'html'
-                exec "!google-chrome-stable % &"
-        elseif &filetype == 'go'
-                " exec "!go build %<"
-                exec "!time go run %"
-        elseif &filetype == 'mkd'
-                exec "!~/.vim/markdown.pl % > %.html &"
-                exec "!firefox %.html &"
-        endif
-endfunc
 
+func! CompileRunGcc()
+	exec "w"
+	if &filetype == 'c'
+		exec "!g++ % -o %<"
+		exec "!time ./%<"
+	elseif &filetype == 'cpp'
+		set splitbelow
+		exec "!g++ -std=c++11 % -Wall -o %<"
+		:sp
+		:res -15
+		:term ./%<
+	elseif &filetype == 'java'
+		exec "!javac %"
+		exec "!time java %<"
+	elseif &filetype == 'sh'
+		:!time bash %
+	elseif &filetype == 'python'
+		set splitbelow
+		:sp
+		:term python3 %
+	elseif &filetype == 'html'
+		silent! exec "!".g:mkdp_browser." % &"
+	elseif &filetype == 'markdown'
+		exec "MarkdownPreview"
+	elseif &filetype == 'tex'
+		silent! exec "VimtexStop"
+		silent! exec "VimtexCompile"
+	elseif &filetype == 'dart'
+		CocCommand flutter.run -d iPhone\ 11\ Pro
+		CocCommand flutter.dev.openDevLog
+	elseif &filetype == 'javascript'
+		set splitbelow
+		:sp
+		:term export DEBUG="INFO,ERROR,WARNING"; node --trace-warnings .
+	elseif &filetype == 'go'
+		set splitbelow
+		:sp
+		:term go run .
+	endif
+endfunc
 
 " ************** vim的配色 **************
 "hi vertsplit ctermbg=bg guibg=bg
@@ -230,8 +332,44 @@ let NERDTreeQuitOnOpen=1                                        " 打开一个�
 let g:autopep8_disable_show_diff=1
 
 
+" ==
+" == GitGutter
+" ==
+"let g:gitgutter_signs = 0
+"let g:gitgutter_map_keys = 0
+"let g:gitgutter_override_sign_column_highlight = 0
+"let g:gitgutter_preview_win_floating = 1
+"autocmd BufWritePost * GitGutter
+"nnoremap <LEADER>gf :GitGutterFold<CR>
+"nnoremap H :GitGutterPreviewHunk<CR>
+"nnoremap <LEADER>g- :GitGutterPrevHunk<CR>
+"nnoremap <LEADER>g= :GitGutterNextHunk<CR>
 
 
+" ===
+" === MarkdownPreview
+" ===
+"let g:mkdp_auto_start = 0
+"let g:mkdp_auto_close = 1
+"let g:mkdp_refresh_slow = 0
+"let g:mkdp_command_for_global = 0
+"let g:mkdp_open_to_the_world = 0
+"let g:mkdp_open_ip = ''
+"let g:mkdp_echo_preview_url = 0
+"let g:mkdp_browserfunc = ''
+"let g:mkdp_preview_options = {
+"			\ 'mkit': {},
+"			\ 'katex': {},
+"			\ 'uml': {},
+"			\ 'maid': {},
+"			\ 'disable_sync_scroll': 0,
+"			\ 'sync_scroll_type': 'middle',
+"			\ 'hide_yaml_meta': 1
+"			\ }
+"let g:mkdp_markdown_css = ''
+"let g:mkdp_highlight_css = ''
+"let g:mkdp_port = ''
+"let g:mkdp_page_title = '「${name}」'
 " vimtex 配置
 "g:vimtex_compiler_method
 
@@ -586,7 +724,7 @@ Plug 'bling/vim-airline'
 
 "COC 补全插件
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
+Plug 'wellle/tmux-complete.vim'
 "*************效率工具*******************
 "vim-autopep8,自动格式化
 Plug 'tell-k/vim-autopep8'
@@ -598,6 +736,31 @@ Plug 'garbas/vim-snipmate'
 Plug 'honza/vim-snippets'
 "自动引号/括号
 Plug 'jiangmiao/auto-pairs'
+
+
+" Git
+Plug 'tpope/vim-fugitive'
+Plug 'theniceboy/vim-gitignore', { 'for': ['gitignore', 'vim-plug'] }
+Plug 'fszymanski/fzf-gitignore', { 'do': ':UpdateRemotePlugins' }
+
+" HTML, CSS, JavaScript, PHP, JSON, etc.
+" Json 文件的语法高亮包
+Plug 'elzr/vim-json'
+Plug 'hail2u/vim-css3-syntax', { 'for': ['vim-plug', 'php', 'html', 'javascript', 'css', 'less'] }
+Plug 'spf13/PIV', { 'for' :['php', 'vim-plug'] }
+" JavaScript 文件的语法搞两包
+Plug 'pangloss/vim-javascript', { 'for': ['vim-plug', 'php', 'html', 'javascript', 'css', 'less'] }
+Plug 'yuezk/vim-js', { 'for': ['vim-plug', 'php', 'html', 'javascript', 'css', 'less'] }
+Plug 'MaxMEllon/vim-jsx-pretty', { 'for': ['vim-plug', 'php', 'html', 'javascript', 'css', 'less'] }
+Plug 'jelera/vim-javascript-syntax', { 'for': ['vim-plug', 'php', 'html', 'javascript', 'css', 'less'] }
+
+" Markdown
+" md 时式预览插件
+Plug 'suan/vim-instant-markdown', {'for': 'markdown'}
+"Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install_sync() }, 'for' :['markdown', 'vim-plug'] }
+Plug 'dhruvasagar/vim-table-mode', { 'on': 'TableModeToggle' }
+Plug 'mzlogin/vim-markdown-toc', { 'for': ['gitignore', 'markdown'] }
+Plug 'theniceboy/bullets.vim'
 
 "*************其他工具******************
 "nerdtree 文件树
@@ -624,10 +787,6 @@ Plug 'sheerun/vim-polyglot'
 Plug 'othree/html5.vim'
 " MD 文件的语法高亮包
 Plug 'plasticboy/vim-markdown'
-" Json 文件的语法高亮包
-Plug 'elzr/vim-json'
-" JavaScript 文件的语法搞两包
-Plug 'pangloss/vim-javascript'
 " css 文件的语法高亮包
 Plug 'JulesWang/css.vim'
 " css3 的语法高亮插件
@@ -649,6 +808,4 @@ Plug 'posva/vim-vue'
 "Plug 'ternjs/tern_for_vim'
 " 色彩高亮，例子: #66CCFF
 Plug 'gorodinskiy/vim-coloresque'
-" md 时式预览插件
-Plug 'suan/vim-instant-markdown', {'for': 'markdown'}
 call plug#end()
