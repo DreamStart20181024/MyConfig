@@ -43,9 +43,9 @@ syntax on                                                           " 语法高�
 "filetype off                                                       " 关闭文件类型自动检测功能,这个功能被filetype plugin indent on代替
 filetype plugin indent on                                          " 载入文件类型插件,代替filetype off 
 set guifont=Hack:h11                                                " 设置字体
-packadd! dracula
+packadd! onedark
 syntax enable
-colorscheme dracula													" 设置dracula高亮主题
+colorscheme onedark													" 设置dracula高亮主题
 "set background=light                                               " 设置vim背景为浅色
 "set background=dark                                                 " 设置vim背景为深色
 " 设置文件编码和文件格式
@@ -231,7 +231,7 @@ nnoremap \f :Autoformat<CR>
 " F5 自动编译文件 Normal+Visual mode
 map <F5> :call CompileRunGcc()<CR>
 
-func! CompileRunGcc()
+function! CompileRunGcc()
 	exec "w"
 	if &filetype == 'c'
 		exec "!g++ % -o %<"
@@ -601,6 +601,7 @@ nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
 
+"codeLens.enable": true
 
 
 
@@ -697,6 +698,8 @@ call plug#begin()
 Plug 'mhinz/vim-startify'
 " 吸血鬼 主题
 Plug 'dracula/vim', { 'as': 'dracula' }
+" 一个不知名的黑色主题
+Plug 'joshdick/onedark.vim'
 "gruvbox 主题
 "Plug 'morhetz/gruvbox'
 "vim-airline 底部状态栏优化
