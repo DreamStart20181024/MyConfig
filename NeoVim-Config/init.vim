@@ -46,6 +46,7 @@ set guifont=Hack:h11                                                " 设置字�
 packadd! onedark
 syntax enable
 colorscheme onedark													" 设置dracula高亮主题
+hi Quote ctermbg=109 guifg=#83a598
 "set background=light                                               " 设置vim背景为浅色
 "set background=dark                                                 " 设置vim背景为深色
 " 设置文件编码和文件格式
