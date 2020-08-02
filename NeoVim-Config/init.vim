@@ -5,9 +5,9 @@
 "|_|  |_| |_|   |_| \_|  \_/  |___|_|  |_|_| \_\\____|
 
 " Author: @Liu Peng
-"
-"
-"
+
+
+
 
 " ===
 " === 首次使用自动加载插件管理器
@@ -33,20 +33,18 @@ source ~/.config/nvim/_machine_specific.vim
 
 
 
-
-
 "" ###################   基本设置    ######################################
-
 set history=1000                                                    "设置历史操作记录为1000条
 set nocompatible                                                    " 不启用vi的键盘模式,而是vim自己的
 syntax on                                                           " 语法高亮支持
-"filetype off                                                       " 关闭文件类型自动检测功能,这个功能被filetype plugin indent on代替
+filetype on                                                       " 关闭文件类型自动检测功能,这个功能被filetype plugin indent on代替
+filetype indent on
+filetype plugin on
 filetype plugin indent on                                          " 载入文件类型插件,代替filetype off 
 set guifont=Hack:h11                                                " 设置字体
-packadd! onedark
-syntax enable
-colorscheme onedark													" 设置dracula高亮主题
-hi Quote ctermbg=109 guifg=#83a598
+"packadd! dracula
+"syntax enable
+"colorscheme dracula													" 设置dracula高亮主题
 "set background=light                                               " 设置vim背景为浅色
 "set background=dark                                                 " 设置vim背景为深色
 " 设置文件编码和文件格式
@@ -55,18 +53,18 @@ set encoding=utf-8
 set fileencodings=utf-8,gbk,cp936,latin-1
 set fileformat=unix
 set fileformats=unix,mac,dos
-set backspace=2                                                     " 设置退格键可用
+set backspace=indent,eol,start                                                     " 设置退格键可用
 set autoindent                                                      " 自动对齐
 set ai!                                                             " 设置自动缩进
 set smartindent                                                     " 智能自动缩进
 set relativenumber                                                  " 开启相对行号
-set nu!                                                             " 显示行号
+set number                                                             " 显示行号
 set ruler                                                           " 右下角显示光标位置的状态行
 set incsearch                                                       " 开启实时搜索功能
 set hlsearch                                                        " 开启高亮显示结果
 set nowrapscan                                                      " 搜索到文件两端时不重新搜索
 "set nocompatible                                                    " 关闭兼容模式
-set hidden                                                          " 允许在有未保存的修改时切换缓冲区
+"set hidden                                                          " 允许在有未保存的修改时切换缓冲区
 set autochdir                                                       " 设定文件浏览器目录为当前目录
 set foldmethod=indent                                               " 选择代码折叠类型
 set foldlevel=100                                                   " 禁止自动折叠
@@ -117,7 +115,7 @@ set tw=0
 set indentexpr=
 set foldenable
 set formatoptions-=tc
-set splitright
+"set splitright
 set splitbelow
 set noshowmode
 set showcmd
@@ -134,8 +132,6 @@ autocmd FilterWritePre * if &diff | setlocal wrap< | endif      " 使用 vimdiff
 
 " 打开文件时自动到文件最后的行
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-
-
 
 
 " ===
@@ -166,37 +162,70 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 "##################################按键设置##################################
 
 " 普通模式下 将 ; 默认为 :
-noremap ; :
-noremap : ;
+"noremap ; :
+"noremap : ;
 " F6自动格式化python文件
 "autocmd FileType python noremap <buffer> <F6> :call Autopep8()<CR>
 
-" \ /k/l/h <LEADER> = \ 分屏窗口移动 Normal mode
-noremap <LEADER>j <C-W>j
-noremap <LEADER>k <C-W>k
-noremap <LEADER>l <C-W>l
-noremap <LEADER>h <C-W>h
 
+" ----------------------  分屏 ------------------
+"  向左分屏，光标移动到新的窗口上
+map su :set splitright<CR>:vsplit<CR>
+"  向左分屏，光标不动
+map si :set nosplitright<CR>:vsplit<CR>
+"  向下分屏，光标不动
+map sn :set nosplitbelow<CR>:split<CR>
+"  向下分屏，光标移动到新的窗口上
+map sm :set splitbelow<CR>:split<CR>
+
+" \ /k/l/h <LEADER> = \ 分屏窗口移动 Normal mode
+noremap <C-j> <C-W>j
+noremap <C-k> <C-W>k
+noremap <C-l> <C-W>l
+noremap <C-h> <C-W>h
+
+" 调整分屏大小
+map <A-j> :res +5<CR>
+map <A-k> :res -5<CR>
+map <A-h> :vertical resize-5<CR>
+map <A-l> :vertical resize+5<CR>
+
+" 创建 tabe
+map tu :tabe<CR>
+map tn :-tabnext<CR>
+map to :+tabnext<CR>
+
+" 将 r 与 R 替换成 虚拟替换模式
+noremap r gr
+noremap R gR
+
+"  复制到系统粘贴板
+noremap y "+y
+noremap p "+p
+
+" 复制一整行
+noremap Y yy
+" 搜索时使光标始终在中间一行。
+noremap n nzz
+noremap N Nzz
 
 " Disable the default s key
+" 关闭s键的默认功能
 noremap s <nop>
 
-
 " Save & quit
-noremap Q :q<CR>
-noremap <C-q> :qa<CR>
-noremap S :w<CR>
+map Q :q<CR>
+map S :w<CR>
+" noremap <C-q> :qa<CR>
+map <A-R> :source $MYVIMRC<CR>
 
 " Open the vimrc file anytime
 noremap <LEADER>rc :e ~/.config/nvim/init.vim<CR>
 
 " make Y to copy till the end of the line 
-nnoremap Y y$
+"nnoremap Y y$
 
 " Copy to system clipboard
-"  复制到系统粘贴板
-vnoremap Y "+y
-vnoremap P "+p
 " 折叠行
 noremap <LEADER>- :lN<CR>
 noremap <LEADER>= :lne<CR>
@@ -227,6 +256,11 @@ nnoremap \f :Autoformat<CR>
 "ctrl+f 复制到系统粘贴板
 "map  <C-F> "+y
 "map! <C-F> "+y
+
+
+
+
+
 
 " ##########################   自动编译文件    ######################################
 " F5 自动编译文件 Normal+Visual mode
@@ -697,6 +731,8 @@ endfunc
 call plug#begin()
 "启动vim或nvim你将看到一个酷酷的启动界面
 Plug 'mhinz/vim-startify'
+" 另一个漂亮的启动界面
+"Plug 'hardcoreplayers/dashboard-nvim'
 " 吸血鬼 主题
 Plug 'dracula/vim', { 'as': 'dracula' }
 " 一个不知名的黑色主题
@@ -760,11 +796,11 @@ Plug 'jelera/vim-javascript-syntax', { 'for': ['vim-plug', 'php', 'html', 'javas
 
 " Markdown
 " md 时式预览插件
-Plug 'suan/vim-instant-markdown', {'for': 'markdown'}
-"Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install_sync() }, 'for' :['markdown', 'vim-plug'] }
-Plug 'dhruvasagar/vim-table-mode', { 'on': 'TableModeToggle' }
-Plug 'mzlogin/vim-markdown-toc', { 'for': ['gitignore', 'markdown'] }
-Plug 'theniceboy/bullets.vim'
+"Plug 'suan/vim-instant-markdown', {'for': 'markdown'}
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install_sync() }, 'for' :['markdown', 'vim-plug'] }
+"Plug 'dhruvasagar/vim-table-mode', { 'on': 'TableModeToggle' }
+"Plug 'mzlogin/vim-markdown-toc', { 'for': ['gitignore', 'markdown'] }
+"Plug 'theniceboy/bullets.vim'
 
 "*************其他工具******************
 "nerdtree 文件树
