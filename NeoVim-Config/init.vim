@@ -160,7 +160,8 @@ au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g
 
 
 "##################################按键设置##################################
-
+" 重新映射 <LEADER> 案件： 默认为： \
+let mapleader = ","
 " 普通模式下 将 ; 默认为 :
 "noremap ; :
 "noremap : ;
@@ -193,7 +194,7 @@ map <A-l> :vertical resize+5<CR>
 " 创建 tabe
 map tu :tabe<CR>
 map tn :-tabnext<CR>
-map to :+tabnext<CR>
+map tl :+tabnext<CR>
 
 " 将 r 与 R 替换成 虚拟替换模式
 noremap r gr
@@ -226,6 +227,9 @@ noremap <LEADER>rc :e ~/.config/nvim/init.vim<CR>
 "nnoremap Y y$
 
 " Copy to system clipboard
+"  复制到系统粘贴板
+vnoremap y "+y
+vnoremap p "+p
 " 折叠行
 noremap <LEADER>- :lN<CR>
 noremap <LEADER>= :lne<CR>
@@ -344,10 +348,10 @@ endfunc
 
 "#####################      插件配置               #########################
 
-" *********** NERDTree插件配置 ***********
+" ------------------ NERDTree插件配置 ------------------
 "树形目录开关
-map <F3> :NERDTreeMirror<CR> 
-map <F3> :NERDTreeToggle<CR> 
+map <C-n> :NERDTreeMirror<CR>
+map <C-n> :NERDTreeToggle<CR>
 " 当只剩 文件窗口管理器时 关闭 vim
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 " 更改默认的 箭头 
